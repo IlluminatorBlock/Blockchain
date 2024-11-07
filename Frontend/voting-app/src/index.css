@@ -1,0 +1,31 @@
+.app-container {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #121212;
+  color: #ffffff;
+}
+
+h1, h2 {
+  color: #00bfa5;
+}
+
+.candidates-list, .vote-section, .leading-candidate {
+  margin-bottom: 20px;
+}
+
+input, select, button {
+  padding: 10px;
+  margin-top: 10px;
+  display: block;
+}
+
+button {
+  background-color: #00bfa5;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #008e7e;
+}

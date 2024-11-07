@@ -70,6 +70,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'voting_backend.wsgi.application'
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Vite frontend URL
+]
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
