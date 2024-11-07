@@ -4,6 +4,7 @@
 cd Truffle
 npm install
 truffle compile
+truffle test
 truffle migrate -network development
 ```
 ### 2nd Terminal
