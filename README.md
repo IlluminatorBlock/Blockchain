@@ -7,7 +7,7 @@ truffle compile
 truffle test
 truffle migrate -network development
 ```
-### 2nd Terminal
+## 2nd Terminal
 ```bash
 cd Backend
 python -m venv venv
@@ -17,7 +17,7 @@ python.exe -m pip install --upgrade pip
 cd voting_backend
 python manage.py runserver
 ```
-### 3rd Terminal
+## 3rd Terminal
 ```bash
 cd Frontend\voting-app
 npm install
