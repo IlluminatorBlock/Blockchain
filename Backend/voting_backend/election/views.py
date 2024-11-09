@@ -23,6 +23,7 @@ def add_candidate(request):
     contract = get_contract()
 
     try:
+        # Add candidate
         tx_hash = contract.functions.addCandidate(candidate_name).transact({'from': w3.eth.accounts[0]})
         return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
     except Exception as e:
@@ -40,6 +41,7 @@ def remove_candidate(request):
     contract = get_contract()
 
     try:
+        # Remove candidate and reorder the remaining candidates
         tx_hash = contract.functions.removeCandidate(candidate_id).transact({'from': w3.eth.accounts[0]})
         return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
     except Exception as e:
@@ -50,27 +52,19 @@ def remove_candidate(request):
 @require_http_methods(["POST"])
 def vote(request):
     data = get_json_data(request)
-    if data is None or 'candidate_id' not in data or 'private_key' not in data:
+    if data is None or 'candidate_id' not in data:
         return JsonResponse({'status': 'error', 'message': 'Invalid input data'}, status=400)
     
     candidate_id = int(data['candidate_id'])
-    private_key = data['private_key']
     contract = get_contract()
 
     try:
-        # Create account from private key using the correct method
-        account = w3.eth.account.privateKeyToAccount(private_key)  # Correctly using Web3 instance
-        
-        # Ensure the account address is valid
-        if account.address != w3.eth.accounts[0]:  # Or another check based on your needs
-            return JsonResponse({'status': 'error', 'message': 'Invalid private key or address mismatch'}, status=400)
-        
-        # Proceed to vote with the valid account
-        tx_hash = contract.functions.vote(candidate_id).transact({'from': account.address})
+        tx_hash = contract.functions.vote(candidate_id).transact({'from': w3.eth.accounts[0]})
         return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
     
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
+
 # Endpoint to get the vote count for a candidate
 @csrf_exempt
 def get_vote_count(request, candidate_id):
@@ -111,14 +105,17 @@ def get_candidates(request):
         candidates_count = contract.functions.getCandidatesCount().call()
         candidates_list = []
         
-        # Retrieve details for each candidate
-        for i in range(1, candidates_count + 1):  # Assuming candidate IDs start from 1
-            candidate = contract.functions.getCandidate(i).call()
-            candidates_list.append({
-                'id': i,
-                'name': candidate[0],
-                'vote_count': candidate[1]
-            })
+        for i in range(1, candidates_count + 1):
+            try:
+                candidate = contract.functions.getCandidate(i).call()
+                if candidate[0]:
+                    candidates_list.append({
+                        'id': i,
+                        'name': candidate[0],
+                        'vote_count': candidate[1]
+                    })
+            except Exception:
+                continue
             
         return JsonResponse({'status': 'success', 'candidates': candidates_list})
     

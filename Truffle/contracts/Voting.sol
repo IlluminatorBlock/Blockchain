@@ -3,76 +3,70 @@ pragma solidity ^0.8.0;
 
 contract Voting {
     struct Candidate {
-        uint id;
         string name;
-        uint voteCount;
+        uint256 voteCount;
+        bool exists; // Flag to check if candidate exists
     }
 
-    // Mappings
-    mapping(uint => Candidate) public candidates;
-    mapping(address => bool) public voters;
+    mapping(uint256 => Candidate) public candidates;
+    mapping(uint256 => bool) public hasVoted; // to track if a voter has already voted with a specific number
+    uint256 public candidatesCount;
+    uint256 public totalVotes;
 
-    // State variables
-    uint public candidatesCount;
-    uint public totalVotes;
-
-    // Events
-    event Voted(address indexed voter, uint indexed candidateId);
-    event CandidateAdded(uint indexed candidateId, string name);
-    event CandidateRemoved(uint indexed candidateId);
-
-    // Modifier to check for valid candidate ID
-    modifier validCandidate(uint _candidateId) {
-        require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID.");
+    modifier hasNotVoted(uint256 voterNumber) {
+        require(!hasVoted[voterNumber], "This number has already voted");
         _;
     }
 
-    // Add a new candidate
-    function addCandidate(string memory _name) public {
-        require(bytes(_name).length > 0, "Candidate name must be non-empty.");
-        candidatesCount++;
-        candidates[candidatesCount] = Candidate(candidatesCount, _name, 0);
-        emit CandidateAdded(candidatesCount, _name);
+    modifier validCandidate(uint256 candidateId) {
+        require(candidateId > 0 && candidateId <= candidatesCount && candidates[candidateId].exists, "Invalid candidate ID");
+        _;
     }
 
-    // Remove a candidate
-    function removeCandidate(uint _candidateId) public validCandidate(_candidateId) {
-        Candidate storage candidateToRemove = candidates[_candidateId];
-        require(bytes(candidateToRemove.name).length > 0, "Candidate does not exist.");
+    // Add a candidate
+    function addCandidate(string memory _name) public {
+        candidatesCount++;
+        candidates[candidatesCount] = Candidate(_name, 0, true);
+    }
 
-        delete candidates[_candidateId];
-        emit CandidateRemoved(_candidateId);
+    // Remove a candidate and reassign IDs of subsequent candidates
+    function removeCandidate(uint256 candidateId) public validCandidate(candidateId) {
+        delete candidates[candidateId];  // Remove the candidate
+
+        // Shift remaining candidates' IDs down
+        for (uint256 i = candidateId + 1; i <= candidatesCount; i++) {
+            candidates[i - 1] = candidates[i];  // Shift each candidate's data to the previous ID
+            delete candidates[i];  // Remove the original data at the old ID
+        }
+        
+        candidatesCount--; // Decrement the total candidates count
     }
 
     // Vote for a candidate
-    function vote(uint _candidateId) public validCandidate(_candidateId) {
-        require(!voters[msg.sender], "You have already voted.");
-
-        voters[msg.sender] = true;
+    function vote(uint256 _candidateId) public {
+        require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID");
         candidates[_candidateId].voteCount++;
         totalVotes++;
-
-        emit Voted(msg.sender, _candidateId);
     }
 
-    // Get the vote count for a candidate
-    function getVoteCount(uint _candidateId) public view validCandidate(_candidateId) returns (uint) {
-        return candidates[_candidateId].voteCount;
+    // Get vote count for a candidate
+    function getVoteCount(uint256 candidateId) public view validCandidate(candidateId) returns (uint256) {
+        return candidates[candidateId].voteCount;
     }
 
-    // Get candidate details (name and vote count)
-    function getCandidate(uint _candidateId) public view validCandidate(_candidateId) returns (string memory name, uint voteCount) {
-        Candidate memory candidate = candidates[_candidateId];
-        return (candidate.name, candidate.voteCount);
-    }
-
-    // Get the total number of candidates
-    function getCandidatesCount() public view returns (uint) {
+    // Get total number of candidates
+    function getCandidatesCount() public view returns (uint256) {
         return candidatesCount;
     }
 
-    // Get total votes cast in the election
-    function getTotalVotes() public view returns (uint) {
+    // Get total votes
+    function getTotalVotes() public view returns (uint256) {
         return totalVotes;
+    }
+
+    // Get candidate by ID
+    function getCandidate(uint256 candidateId) public view validCandidate(candidateId) returns (string memory, uint256) {
+        Candidate memory candidate = candidates[candidateId];
+        return (candidate.name, candidate.voteCount);
     }
 }

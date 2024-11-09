@@ -8,7 +8,7 @@ w3 = Web3(Web3.HTTPProvider(ganache_url))
 if not w3.is_connected():
     raise Exception("Failed to connect to Ganache!")
 
-# Contract ABI (you can paste the ABI provided here)
+
 contract_abi = [
     {
         "anonymous": False,
@@ -156,7 +156,7 @@ contract_abi = [
 ]
 
 # Replace with your actual contract address from Ganache or deployment output
-contract_address = '0x8f2C9520c4c6d6b6209230aC795967a06Cd5B1C0'
+contract_address = '0x6fb89EB9E65b6B39EE75283c6AbC2CA2C98B5DE2'
 
 # Initialize the contract
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
