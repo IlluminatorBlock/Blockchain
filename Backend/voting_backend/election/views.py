@@ -23,7 +23,6 @@ def add_candidate(request):
     contract = get_contract()
 
     try:
-        # Add candidate
         tx_hash = contract.functions.addCandidate(candidate_name).transact({'from': w3.eth.accounts[0]})
         return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
     except Exception as e:
@@ -41,7 +40,6 @@ def remove_candidate(request):
     contract = get_contract()
 
     try:
-        # Remove candidate and reorder the remaining candidates
         tx_hash = contract.functions.removeCandidate(candidate_id).transact({'from': w3.eth.accounts[0]})
         return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
     except Exception as e:

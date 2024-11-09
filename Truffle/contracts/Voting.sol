@@ -5,7 +5,7 @@ contract Voting {
     struct Candidate {
         string name;
         uint256 voteCount;
-        bool exists; // Flag to check if candidate exists
+        bool exists;
     }
 
     mapping(uint256 => Candidate) public candidates;
@@ -38,8 +38,7 @@ contract Voting {
             candidates[i - 1] = candidates[i];  // Shift each candidate's data to the previous ID
             delete candidates[i];  // Remove the original data at the old ID
         }
-        
-        candidatesCount--; // Decrement the total candidates count
+        candidatesCount--;
     }
 
     // Vote for a candidate
