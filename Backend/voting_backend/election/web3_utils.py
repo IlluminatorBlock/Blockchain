@@ -156,7 +156,7 @@ contract_abi = [
 ]
 
 # Replace with your actual contract address from Ganache or deployment output
-contract_address = '0xb84fe2d2DBcc8c86AEE93Fd385b893c714eD3b60'
+contract_address = '0xBeB7F8C7071947a8B1d8af1f980AE1F0246B6b77'
 
 # Initialize the contract
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
