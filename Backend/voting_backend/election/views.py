@@ -1,7 +1,7 @@
 import json
-from django.http import JsonResponse # type: ignore
-from django.views.decorators.csrf import csrf_exempt # type: ignore
-from django.views.decorators.http import require_http_methods # type: ignore
+from django.http import JsonResponse  # type: ignore
+from django.views.decorators.csrf import csrf_exempt  # type: ignore
+from django.views.decorators.http import require_http_methods  # type: ignore
 from .web3_utils import get_contract, w3
 
 # Utility function to parse JSON body
@@ -11,55 +11,83 @@ def get_json_data(request):
     except json.JSONDecodeError:
         return None
 
-# Endpoint to add a candidate
+# Endpoint to register a voter
+@csrf_exempt
+@require_http_methods(["POST"])
+def register_voter(request):
+    data = get_json_data(request)
+    required_fields = ['voter_id', 'full_name', 'adhaar_card', 'username', 'password']
+    if data is None or not all(field in data for field in required_fields):
+        return JsonResponse({'status': 'error', 'message': 'Invalid input data'}, status=400)
+
+    voter_id = int(data['voter_id'])
+    full_name = data['full_name']
+    adhaar_card = data['adhaar_card']
+    username = data['username']
+    password = data['password']
+
+    contract = get_contract()
+    try:
+        tx_hash = contract.functions.registerVoter(voter_id, full_name, adhaar_card, username, password).transact({'from': w3.eth.accounts[0]})
+        return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
+
+# Endpoint to add a candidate with a secret key
 @csrf_exempt
 @require_http_methods(["POST"])
 def add_candidate(request):
     data = get_json_data(request)
-    if data is None or 'name' not in data:
+    if data is None or 'name' not in data or 'secret_key' not in data:
         return JsonResponse({'status': 'error', 'message': 'Invalid input data'}, status=400)
 
     candidate_name = data['name']
+    secret_key = data['secret_key']
     contract = get_contract()
 
     try:
-        tx_hash = contract.functions.addCandidate(candidate_name).transact({'from': w3.eth.accounts[0]})
+        tx_hash = contract.functions.addCandidate(candidate_name, secret_key).transact({'from': w3.eth.accounts[0]})
         return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 
-# Endpoint to remove a candidate
+# Endpoint to remove a candidate with a secret key
 @csrf_exempt
 @require_http_methods(["POST"])
 def remove_candidate(request):
     data = get_json_data(request)
-    if data is None or 'candidate_id' not in data:
+    if data is None or 'candidate_id' not in data or 'secret_key' not in data:
         return JsonResponse({'status': 'error', 'message': 'Invalid input data'}, status=400)
 
     candidate_id = int(data['candidate_id'])
+    secret_key = data['secret_key']
     contract = get_contract()
 
     try:
-        tx_hash = contract.functions.removeCandidate(candidate_id).transact({'from': w3.eth.accounts[0]})
+        tx_hash = contract.functions.removeCandidate(candidate_id, secret_key).transact({'from': w3.eth.accounts[0]})
         return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 
-# Endpoint to vote for a candidate
+# Endpoint to vote for a candidate with voter credentials
 @csrf_exempt
 @require_http_methods(["POST"])
 def vote(request):
     data = get_json_data(request)
-    if data is None or 'candidate_id' not in data:
+    required_fields = ['voter_id', 'username', 'password', 'candidate_id']
+    if data is None or not all(field in data for field in required_fields):
         return JsonResponse({'status': 'error', 'message': 'Invalid input data'}, status=400)
-    
+
+    voter_id = int(data['voter_id'])
+    username = data['username']
+    password = data['password']
     candidate_id = int(data['candidate_id'])
+
     contract = get_contract()
 
     try:
-        tx_hash = contract.functions.vote(candidate_id).transact({'from': w3.eth.accounts[0]})
+        tx_hash = contract.functions.vote(voter_id, username, password, candidate_id).transact({'from': w3.eth.accounts[0]})
         return JsonResponse({'status': 'success', 'tx_hash': tx_hash.hex()})
-    
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)})
 
@@ -98,11 +126,11 @@ def get_total_votes(request):
 @require_http_methods(["GET"])
 def get_candidates(request):
     contract = get_contract()
-    
+
     try:
         candidates_count = contract.functions.getCandidatesCount().call()
         candidates_list = []
-        
+
         for i in range(1, candidates_count + 1):
             try:
                 candidate = contract.functions.getCandidate(i).call()
@@ -114,8 +142,8 @@ def get_candidates(request):
                     })
             except Exception:
                 continue
-            
+
         return JsonResponse({'status': 'success', 'candidates': candidates_list})
-    
+
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)

@@ -1,7 +1,8 @@
-from django.urls import path
+from django.urls import path # type: ignore
 from . import views
 
 urlpatterns = [
+    path('register_voter/', views.register_voter, name='register_voter'),
     path('add_candidate/', views.add_candidate, name='add_candidate'),
     path('remove_candidate/', views.remove_candidate, name='remove_candidate'),
     path('vote/', views.vote, name='vote'),

@@ -1,73 +1,38 @@
-from web3 import Web3
+from web3 import Web3 # type: ignore
 
-# Connect to Ganache
-ganache_url = "http://127.0.0.1:7545"  # Adjust if necessary
+ganache_url = "http://127.0.0.1:7545"
 w3 = Web3(Web3.HTTPProvider(ganache_url))
 
-# Check if connected
 if not w3.is_connected():
     raise Exception("Failed to connect to Ganache!")
 
 
 contract_abi = [
     {
-        "anonymous": False,
         "inputs": [
             {
-                "indexed": True,
                 "internalType": "uint256",
-                "name": "candidateId",
+                "name": "",
                 "type": "uint256"
-            },
+            }
+        ],
+        "name": "candidates",
+        "outputs": [
             {
-                "indexed": False,
                 "internalType": "string",
                 "name": "name",
                 "type": "string"
-            }
-        ],
-        "name": "CandidateAdded",
-        "type": "event"
-    },
-    {
-        "anonymous": False,
-        "inputs": [
-            {
-                "indexed": True,
-                "internalType": "uint256",
-                "name": "candidateId",
-                "type": "uint256"
-            }
-        ],
-        "name": "CandidateRemoved",
-        "type": "event"
-    },
-    {
-        "anonymous": False,
-        "inputs": [
-            {
-                "indexed": True,
-                "internalType": "address",
-                "name": "voter",
-                "type": "address"
             },
             {
-                "indexed": True,
                 "internalType": "uint256",
-                "name": "candidateId",
+                "name": "voteCount",
                 "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "exists",
+                "type": "bool"
             }
-        ],
-        "name": "Voted",
-        "type": "event"
-    },
-    {
-        "inputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "name": "candidates",
-        "outputs": [
-            {"internalType": "uint256", "name": "id", "type": "uint256"},
-            {"internalType": "string", "name": "name", "type": "string"},
-            {"internalType": "uint256", "name": "voteCount", "type": "uint256"}
         ],
         "stateMutability": "view",
         "type": "function",
@@ -76,7 +41,33 @@ contract_abi = [
     {
         "inputs": [],
         "name": "candidatesCount",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": True
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "hasVoted",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
         "stateMutability": "view",
         "type": "function",
         "constant": True
@@ -84,54 +75,169 @@ contract_abi = [
     {
         "inputs": [],
         "name": "totalVotes",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
         "stateMutability": "view",
         "type": "function",
         "constant": True
     },
     {
-        "inputs": [{"internalType": "address", "name": "", "type": "address"}],
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
         "name": "voters",
-        "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "fullName",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "adhaarCard",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "username",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "password",
+                "type": "string"
+            },
+            {
+                "internalType": "bool",
+                "name": "exists",
+                "type": "bool"
+            }
+        ],
         "stateMutability": "view",
         "type": "function",
         "constant": True
     },
     {
-        "inputs": [{"internalType": "string", "name": "_name", "type": "string"}],
+        "inputs": [
+            {
+                "internalType": "string",
+                "name": "_name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "_secretKey",
+                "type": "string"
+            }
+        ],
         "name": "addCandidate",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [{"internalType": "uint256", "name": "_candidateId", "type": "uint256"}],
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "candidateId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "_secretKey",
+                "type": "string"
+            }
+        ],
         "name": "removeCandidate",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [{"internalType": "uint256", "name": "_candidateId", "type": "uint256"}],
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "voterId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "fullName",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "adhaarCard",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "username",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "password",
+                "type": "string"
+            }
+        ],
+        "name": "registerVoter",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "voterId",
+                "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "username",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "password",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "candidateId",
+                "type": "uint256"
+            }
+        ],
         "name": "vote",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "inputs": [{"internalType": "uint256", "name": "_candidateId", "type": "uint256"}],
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "candidateId",
+                "type": "uint256"
+            }
+        ],
         "name": "getVoteCount",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
-        "stateMutability": "view",
-        "type": "function",
-        "constant": True
-    },
-    {
-        "inputs": [{"internalType": "uint256", "name": "_candidateId", "type": "uint256"}],
-        "name": "getCandidate",
         "outputs": [
-            {"internalType": "string", "name": "name", "type": "string"},
-            {"internalType": "uint256", "name": "voteCount", "type": "uint256"}
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
         ],
         "stateMutability": "view",
         "type": "function",
@@ -140,7 +246,13 @@ contract_abi = [
     {
         "inputs": [],
         "name": "getCandidatesCount",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
         "stateMutability": "view",
         "type": "function",
         "constant": True
@@ -148,7 +260,38 @@ contract_abi = [
     {
         "inputs": [],
         "name": "getTotalVotes",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function",
+        "constant": True
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "candidateId",
+                "type": "uint256"
+            }
+        ],
+        "name": "getCandidate",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
         "stateMutability": "view",
         "type": "function",
         "constant": True
@@ -156,9 +299,8 @@ contract_abi = [
 ]
 
 # Replace with your actual contract address from Ganache or deployment output
-contract_address = '0xBeB7F8C7071947a8B1d8af1f980AE1F0246B6b77'
+contract_address = '0x0042068260DC111CDd5914A0A6a3381D2038A257'
 
-# Initialize the contract
 contract = w3.eth.contract(address=contract_address, abi=contract_abi)
 
 def get_contract():

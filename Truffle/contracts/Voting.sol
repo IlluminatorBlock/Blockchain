@@ -8,13 +8,24 @@ contract Voting {
         bool exists;
     }
 
+    struct Voter {
+        string fullName;
+        string adhaarCard;
+        string username;
+        string password;
+        bool exists;
+    }
+
     mapping(uint256 => Candidate) public candidates;
-    mapping(uint256 => bool) public hasVoted; // to track if a voter has already voted with a specific number
+    mapping(uint256 => bool) public hasVoted; // Track if a voter has already voted with their voter ID
+    mapping(uint256 => Voter) public voters; // Store voter information by voter ID
+
     uint256 public candidatesCount;
     uint256 public totalVotes;
+    string private constant SECRET_KEY = "test";
 
-    modifier hasNotVoted(uint256 voterNumber) {
-        require(!hasVoted[voterNumber], "This number has already voted");
+    modifier hasNotVoted(uint256 voterId) {
+        require(!hasVoted[voterId], "This voter has already voted");
         _;
     }
 
@@ -23,28 +34,65 @@ contract Voting {
         _;
     }
 
-    // Add a candidate
-    function addCandidate(string memory _name) public {
+    modifier validVoter(uint256 voterId, string memory username, string memory password) {
+        require(voters[voterId].exists, "Voter does not exist");
+        require(
+            keccak256(abi.encodePacked(voters[voterId].username)) == keccak256(abi.encodePacked(username)) &&
+            keccak256(abi.encodePacked(voters[voterId].password)) == keccak256(abi.encodePacked(password)),
+            "Invalid username or password"
+        );
+        _;
+    }
+
+    // Add a candidate using the secret key
+    function addCandidate(string memory _name, string memory _secretKey) public {
+        require(keccak256(abi.encodePacked(_secretKey)) == keccak256(abi.encodePacked(SECRET_KEY)), "Invalid secret key");
         candidatesCount++;
         candidates[candidatesCount] = Candidate(_name, 0, true);
     }
 
-    // Remove a candidate and reassign IDs of subsequent candidates
-    function removeCandidate(uint256 candidateId) public validCandidate(candidateId) {
-        delete candidates[candidateId];  // Remove the candidate
+    // Remove a candidate using the secret key
+    function removeCandidate(uint256 candidateId, string memory _secretKey) public validCandidate(candidateId) {
+        require(keccak256(abi.encodePacked(_secretKey)) == keccak256(abi.encodePacked(SECRET_KEY)), "Invalid secret key");
+
+        delete candidates[candidateId];
 
         // Shift remaining candidates' IDs down
         for (uint256 i = candidateId + 1; i <= candidatesCount; i++) {
-            candidates[i - 1] = candidates[i];  // Shift each candidate's data to the previous ID
-            delete candidates[i];  // Remove the original data at the old ID
+            candidates[i - 1] = candidates[i];
+            delete candidates[i];
         }
         candidatesCount--;
     }
 
+    // Register a new voter
+    function registerVoter(
+        uint256 voterId,
+        string memory fullName,
+        string memory adhaarCard,
+        string memory username,
+        string memory password
+    ) public {
+        require(!voters[voterId].exists, "Voter ID already registered");
+
+        voters[voterId] = Voter({
+            fullName: fullName,
+            adhaarCard: adhaarCard,
+            username: username,
+            password: password,
+            exists: true
+        });
+    }
+
     // Vote for a candidate
-    function vote(uint256 _candidateId) public {
-        require(_candidateId > 0 && _candidateId <= candidatesCount, "Invalid candidate ID");
-        candidates[_candidateId].voteCount++;
+    function vote(
+        uint256 voterId,
+        string memory username,
+        string memory password,
+        uint256 candidateId
+    ) public validCandidate(candidateId) validVoter(voterId, username, password) hasNotVoted(voterId) {
+        candidates[candidateId].voteCount++;
+        hasVoted[voterId] = true;
         totalVotes++;
     }
 
