@@ -2,7 +2,7 @@
 ## 1st terminal
 ```bash
 cd Truffle
-npm install
+npm install -g truffle
 truffle compile
 truffle test
 truffle migrate -network development
@@ -12,7 +12,7 @@ truffle migrate -network development
 cd Backend
 python -m venv venv
 venv\Scripts\Activate
-pip install -r reqiurements.txt
+pip install -r requirements.txt
 python.exe -m pip install --upgrade pip
 cd voting_backend
 python manage.py runserver
