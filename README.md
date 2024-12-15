@@ -13,13 +13,12 @@ cd Backend
 python -m venv venv
 venv\Scripts\Activate
 pip install -r requirements.txt
-python.exe -m pip install --upgrade pip
 cd voting_backend
 python manage.py runserver
 ```
 ## 3rd Terminal
 ```bash
-cd Frontend\voting-app
+cd Frontend\voting_run
 npm install
 npm install axios
 npm run dev 
