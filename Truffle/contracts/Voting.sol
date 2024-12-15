@@ -19,6 +19,7 @@ contract Voting {
     mapping(uint256 => Candidate) public candidates;
     mapping(uint256 => bool) public hasVoted; // Track if a voter has already voted with their voter ID
     mapping(uint256 => Voter) public voters; // Store voter information by voter ID
+    mapping(string => bool) private usernameExists; // Track registered usernames
 
     uint256 public candidatesCount;
     uint256 public totalVotes;
@@ -55,6 +56,9 @@ contract Voting {
     function removeCandidate(uint256 candidateId, string memory _secretKey) public validCandidate(candidateId) {
         require(keccak256(abi.encodePacked(_secretKey)) == keccak256(abi.encodePacked(SECRET_KEY)), "Invalid secret key");
 
+        // Deduct the candidate's votes from the totalVotes
+        totalVotes -= candidates[candidateId].voteCount;
+
         delete candidates[candidateId];
 
         // Shift remaining candidates' IDs down
@@ -74,6 +78,7 @@ contract Voting {
         string memory password
     ) public {
         require(!voters[voterId].exists, "Voter ID already registered");
+        require(!usernameExists[username], "Username already exists"); // Check for unique username
 
         voters[voterId] = Voter({
             fullName: fullName,
@@ -82,6 +87,8 @@ contract Voting {
             password: password,
             exists: true
         });
+
+        usernameExists[username] = true; // Mark the username as registered
     }
 
     // Vote for a candidate

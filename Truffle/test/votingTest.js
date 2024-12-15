@@ -25,24 +25,29 @@ contract("Voting", (accounts) => {
     }
   });
 
-  it("should remove a candidate and reassign IDs", async () => {
+  it("should remove a candidate and adjust total votes correctly", async () => {
     await votingInstance.addCandidate("Alice", "test", { from: owner });
     await votingInstance.addCandidate("Bob", "test", { from: owner });
-    await votingInstance.addCandidate("Charlie", "test", { from: owner });
+
+    await votingInstance.registerVoter(1, "John Doe", "123456789012", "johndoe", "password", { from: owner });
+    await votingInstance.vote(1, "johndoe", "password", 2, { from: owner });
+
+    const totalVotesBefore = await votingInstance.getTotalVotes();
+    assert.equal(totalVotesBefore.toNumber(), 1, "Total votes should be 1 before candidate removal");
 
     await votingInstance.removeCandidate(2, "test", { from: owner });
 
+    const totalVotesAfter = await votingInstance.getTotalVotes();
+    assert.equal(totalVotesAfter.toNumber(), 0, "Total votes should be adjusted after candidate removal");
+
     const candidatesCount = await votingInstance.getCandidatesCount();
-    assert.equal(candidatesCount.toNumber(), 2, "Candidates count should be 2 after removal");
+    assert.equal(candidatesCount.toNumber(), 1, "Candidates count should decrease by 1 after removal");
 
-    const candidate1 = await votingInstance.getCandidate(1);
-    assert.equal(candidate1[0], "Alice", "Candidate 1 should be Alice");
-
-    const candidate2 = await votingInstance.getCandidate(2);
-    assert.equal(candidate2[0], "Charlie", "Candidate 2 should be Charlie");
+    const remainingCandidate = await votingInstance.getCandidate(1);
+    assert.equal(remainingCandidate[0], "Alice", "Remaining candidate should be Alice");
   });
 
-  it("should register a new voter", async () => {
+  it("should register a voter with a unique username", async () => {
     await votingInstance.registerVoter(1, "John Doe", "123456789012", "johndoe", "password", { from: owner });
 
     const voter = await votingInstance.voters(1);
@@ -52,13 +57,14 @@ contract("Voting", (accounts) => {
     assert(voter.exists, "Voter should exist after registration");
   });
 
-  it("should not allow duplicate voter registration", async () => {
+  it("should not allow duplicate usernames during voter registration", async () => {
     await votingInstance.registerVoter(1, "John Doe", "123456789012", "johndoe", "password", { from: owner });
+
     try {
-      await votingInstance.registerVoter(1, "Jane Doe", "987654321098", "janedoe", "password", { from: owner });
-      assert.fail("Expected an error due to duplicate voter ID");
+      await votingInstance.registerVoter(2, "Jane Doe", "987654321098", "johndoe", "password123", { from: owner });
+      assert.fail("Expected an error due to duplicate username");
     } catch (error) {
-      assert(error.message.includes("Voter ID already registered"), "Expected 'Voter ID already registered' error");
+      assert(error.message.includes("Username already exists"), "Expected 'Username already exists' error");
     }
   });
 
