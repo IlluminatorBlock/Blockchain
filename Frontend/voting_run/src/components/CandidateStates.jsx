@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axiosInstance from '../axiosInstance';
+import FloatingShape from './shapes/FloatingShape';
 
 const CandidateStates = () => {
     const [candidates, setCandidates] = useState([]);
@@ -64,6 +65,8 @@ const CandidateStates = () => {
                     <strong>Total Votes:</strong> {totalVotes}
                 </div>
             </div>
+            <FloatingShape />
+          
         </div>
     );
 };

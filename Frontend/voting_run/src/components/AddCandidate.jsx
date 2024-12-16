@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axiosInstance from '../axiosInstance';
+import FloatingShape from './shapes/FloatingShape';
 
 const AddCandidate = () => {
     const [name, setName] = useState('');
@@ -17,6 +18,7 @@ const AddCandidate = () => {
             if (response.data.status === 'success') {
                 setMessage('Candidate added successfully!');
                 setError('');
+                resetForm(); // Reset form after successful submission
             } else {
                 setError(response.data.message || 'An error occurred while adding the candidate.');
                 setMessage('');
@@ -25,6 +27,12 @@ const AddCandidate = () => {
             setError(error.response?.data?.message || 'An error occurred while adding the candidate.');
             setMessage('');
         }
+    };
+
+    // Reset the form fields
+    const resetForm = () => {
+        setName('');
+        setSecretKey('');
     };
 
     return (
@@ -61,7 +69,7 @@ const AddCandidate = () => {
                     <div className="mb-4">
                         <label className="block text-green-300 mb-2">Secret Key</label>
                         <input
-                            type="text"
+                            type="password" // Make secret key input field like a password
                             placeholder="Secret Key"
                             value={secretKey}
                             onChange={(e) => setSecretKey(e.target.value)}
@@ -71,9 +79,12 @@ const AddCandidate = () => {
                     </div>
                     {message && <p className="text-green-500">{message}</p>}
                     {error && <p className="text-red-500">{error}</p>}
-                    <button type="submit" className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mt-4">Add Candidate</button>
+                    <button type="submit" className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mt-4">
+                        Add Candidate
+                    </button>
                 </form>
             </div>
+            <FloatingShape />
         </div>
     );
 };

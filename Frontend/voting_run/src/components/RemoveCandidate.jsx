@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axiosInstance from '../axiosInstance'; // Import the Axios instance
+import FloatingShape from './shapes/FloatingShape';
 
 const RemoveCandidate = () => {
     const [candidateId, setCandidateId] = useState('');
@@ -17,6 +18,9 @@ const RemoveCandidate = () => {
             if (response.data.status === 'success') {
                 setMessage('Candidate removed successfully!');
                 setError('');
+                // Reset the form fields
+                setCandidateId('');
+                setSecretKey('');
             } else {
                 setError(response.data.message || 'An error occurred while removing the candidate.');
                 setMessage('');
@@ -61,7 +65,7 @@ const RemoveCandidate = () => {
                     <div className="mb-4">
                         <label className="block text-green-300 mb-2">Secret Key</label>
                         <input
-                            type="text"
+                            type="password"  // Make the secret key input like a password field
                             placeholder="Secret Key"
                             value={secretKey}
                             onChange={(e) => setSecretKey(e.target.value)}
@@ -74,6 +78,7 @@ const RemoveCandidate = () => {
                     <button type="submit" className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mt-4">Remove Candidate</button>
                 </form>
             </div>
+            <FloatingShape />
         </div>
     );
 };

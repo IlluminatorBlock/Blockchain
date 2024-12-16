@@ -14,3 +14,16 @@
 .fade-in {
   animation: fadeIn 0.5s ease forwards; /* Adjust duration and easing as needed */
 }
+
+nav {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+nav a {
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+nav a:hover {
+  color: #38a169; /* Change to a lighter green on hover */
+}
