@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faIdCard, faLock } from '@fortawesome/free-solid-svg-icons';
 import FloatingShape from './shapes/FloatingShape';
 import FaceAuth from '../auth/FaceAuth';
-import { useNavigate } from 'react-router-dom';
 import PasswordStrengthMeter from './utils/PasswordStrengthMeter';
 import axiosInstance from '../axiosInstance';
 
@@ -14,9 +13,9 @@ const Signup = () => {
     const [aadharId, setAadharId] = useState('');
     const [voterId, setVoterId] = useState('');
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const [capturedImage, setCapturedImage] = useState(null);
-    const navigate = useNavigate();
-    const [setIsCameraOpen] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -29,13 +28,28 @@ const Signup = () => {
                 password,
             });
             if (response.data.status === 'success') {
-                navigate('/voting');
+                setSuccessMessage('USER REGISTERED SUCCESSFULLY!');
+                setError(''); // Clear any previous error messages
+                setIsModalOpen(true); // Open the modal
+                // Clear the form fields after successful registration
+                setFullName('');
+                setUsername('');
+                setPassword('');
+                setAadharId('');
+                setVoterId('');
+                setCapturedImage(null); // Clear captured image if any
             } else {
                 setError(response.data.message || 'An error occurred during registration.');
+                setSuccessMessage(''); // Clear success message if there's an error
             }
         } catch (error) {
             setError(error.response?.data?.message || 'An error occurred during registration.');
+            setSuccessMessage(''); // Clear success message if there's an error
         }
+    };
+
+    const closeModal = () => {
+        setIsModalOpen(false);
     };
 
     return (
@@ -43,6 +57,7 @@ const Signup = () => {
             backgroundAttachment: 'fixed',
         }}>
             <FloatingShape />
+            
             <div
                 style={{
                     backgroundColor: 'rgba(31, 41, 55, 0.7)',
@@ -125,18 +140,34 @@ const Signup = () => {
                     <FaceAuth 
                         onCapture={(data) => {
                             setCapturedImage(data);
-                            setIsCameraOpen(false);
                         }} 
-                        onOpenCamera={() => setIsCameraOpen(true)} 
                     />
                     {capturedImage && <img src={capturedImage} alt="Captured" style={{ width: '100%', borderRadius: '10px', marginTop: '10px' }} />}
                     
                     <button type="submit" className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mt-4">Signup</button>
                 </form>
+
                 <p className="mt-4 text-center text-gray-300">
                     Already a user? <a href="/voting" className="text-green-500 hover:underline">Vote</a>
                 </p>
             </div>
+
+            {/* Success Modal */}
+            {isModalOpen && (
+                <div className="fixed inset-0 flex justify-center items-center z-20">
+                    <div className="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm"></div> {/* Translucent and blurred background */}
+                    <div className="bg-gradient-to-br from-green-600 via-teal-600 to-green-800 p-8 rounded-lg text-center text-white w-3/4 max-w-md z-30">
+                        <h2 className="text-4xl font-extrabold mb-4">USER REGISTERED SUCCESSFULLY!</h2>
+                        <p className="text-xl mb-6">You can now proceed to vote.</p>
+                        <button
+                            onClick={closeModal}
+                            className="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600 transition"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
