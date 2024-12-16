@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faIdCard, faLock, faCircleUser  } from '@fortawesome/free-solid-svg-icons';
 import FloatingShape from './shapes/FloatingShape';
-import FaceAuth from '../auth/FaceAuth'; // Import the FaceAuth component
+import FaceAuth from '../auth/FaceAuth';
 import { useNavigate } from 'react-router-dom';
-import Spinner from './shapes/Spinner'; // Import the Spinner component
-import { toast } from 'react-toastify'; // Import toast for alerts
+import Spinner from './shapes/Spinner';
+import { toast } from 'react-toastify';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [voterId, setVoterId] = useState('');
-    const [isLoading, setIsLoading] = useState(false); // Loading state
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        setIsVisible(true); // Set visibility to true when component mounts
+        setIsVisible(true);
     }, []);
 
     const handleLogin = (e) => {

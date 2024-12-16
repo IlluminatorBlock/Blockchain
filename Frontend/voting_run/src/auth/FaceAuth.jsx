@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 const FaceAuth = () => {
     const videoRef = useRef(null);
@@ -26,7 +26,6 @@ const FaceAuth = () => {
         const data = canvas.toDataURL('image/png');
         setImageData(data);
         setIsCameraOpen(false);
-        // Stop all video tracks
         const stream = videoRef.current.srcObject;
         const tracks = stream.getTracks();
         tracks.forEach(track => track.stop());

@@ -1,32 +1,48 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import FloatingShape from './shapes/FloatingShape'; // Adjust the path as necessary
-
+import FloatingShape from './shapes/FloatingShape';
 
 const HomePage = () => {
     const navigate = useNavigate();
-return(
+
+    return (
         <div className="flex items-center justify-center h-screen bg-gradient-to-br from-black to-green-900 via-emerald-900 relative overflow-hidden">
             <div className="bg-gray-800 bg-opacity-70 p-8 rounded shadow-md w-96 z-10 text-center">
                 <h1 className="text-3xl font-bold text-green-300 mb-6">Welcome to Blockchain Voting</h1>
                 <p className="text-green-200 mb-6">The most secure voting is your right!</p>
                 <button 
-                    onClick={() => navigate('/login')} 
+                    onClick={() => navigate('/voting')} 
                     className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mb-4"
                 >
-                    Login
+                    Vote
                 </button>
                 <button 
                     onClick={() => navigate('/signup')} 
-                    className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
+                    className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mb-4"
                 >
                     Sign Up
+                </button>
+                <button 
+                    onClick={() => navigate('/add-candidate')} 
+                    className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mb-4"
+                >
+                    Add Candidate
+                </button>
+                <button 
+                    onClick={() => navigate('/remove-candidate')} 
+                    className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mb-4"
+                >
+                    Remove Candidate
+                </button>
+                <button 
+                    onClick={() => navigate('/candidate-states')} 
+                    className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
+                >
+                    Fetch Candidate Details
                 </button>
             </div>
             <FloatingShape />
         </div>
-);
-    
+    );
 };
 
 export default HomePage;
