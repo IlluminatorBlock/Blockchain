@@ -1,5 +1,3 @@
-// components/Home.jsx
-import React from 'react';
 import FloatingShape from './shapes/FloatingShape';
 import { useNavigate } from 'react-router-dom';
 
