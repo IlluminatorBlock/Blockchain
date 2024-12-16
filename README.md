@@ -20,6 +20,5 @@ python manage.py runserver
 ```bash
 cd Frontend\voting_run
 npm install
-npm install axios
 npm run dev 
 ```
