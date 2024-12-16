@@ -6,6 +6,10 @@ import ThankYouPage from './components/ThankYouPage'; // Adjusted path to ThankY
 import LoginPage from './components/Login'; // Adjusted path to LoginPage component
 import SignUpPage from './components/Signup'; // Adjusted path to SignUpPage component
 
+
+
+// import './App.css';
+
 const App = () => {
     return (
         <Router>
