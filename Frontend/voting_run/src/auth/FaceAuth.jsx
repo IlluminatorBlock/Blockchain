@@ -18,6 +18,7 @@ const FaceAuth = () => {
         }
     };
 
+
     const captureImage = () => {
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
@@ -39,13 +40,22 @@ const FaceAuth = () => {
 
     return (
         <div>
-            <button onClick={() => setIsCameraOpen(true)} className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition mb-4">
+            <button 
+                onClick={(e) => {
+                    e.preventDefault(); // Prevent form submission
+                    setIsCameraOpen(true);
+                }} 
+                className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600 transition mb-4"
+            >
                 Open Camera
             </button>
             {isCameraOpen && (
                 <div>
                     <video ref={videoRef} autoPlay style={{ width: '100%', borderRadius: '10px' }} />
-                    <button onClick={captureImage} className="mt-2 w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition">
+                    <button 
+                        onClick={captureImage} 
+                        className="mt-2 w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition"
+                    >
                         Capture Image
                     </button>
                     <canvas ref={canvasRef} style={{ display: 'none' }} width="640" height="480" />

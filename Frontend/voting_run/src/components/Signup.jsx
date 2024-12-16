@@ -1,38 +1,52 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser , faIdCard, faFingerprint, faLock } from '@fortawesome/free-solid-svg-icons';
+import { faUser , faIdCard, faLock } from '@fortawesome/free-solid-svg-icons';
 import FloatingShape from './shapes/FloatingShape';
 import FaceAuth from '../auth/FaceAuth'; // Import the FaceAuth component
 import { useNavigate } from 'react-router-dom';
+import PasswordStrengthMeter from './utils/PasswordStrengthMeter'; // Import the PasswordStrengthMeter component
+
 
 const Signup = () => {
-  const [FullName,setFullName]=useState('');
-    const [username, setUsername] = useState(''); // State for username
-    const [password, setPassword] = useState(''); // State for password
+    const [FullName, setFullName] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
     const [aadharId, setAadharId] = useState('');
     const [voterId, setVoterId] = useState('');
     const [error, setError] = useState('');
     const [capturedImage, setCapturedImage] = useState(null);
     const navigate = useNavigate();
+    const [isCameraOpen, setIsCameraOpen] = useState(false); // State for camera visibility
 
     const handleSignup = (e) => {
         e.preventDefault();
-        // Simulate checking Aadhar and Voter ID
-        if (aadharId !== 'validAadharId' || voterId !== 'validVoterId') { // Replace with actual validation logic
-            setError('Aadhar and Voter ID do not match.');
-        } else {
-            setError('');
-            navigate('/otp-verification'); // Navigate to OTP verification page
+            navigate('/voting'); 
         }
-    };
 
     return (
-        <div className="flex items-center justify-center h-screen bg-gradient-to-br from-black to-green-900 via-emerald-900 relative overflow-hidden">
+        <div className={`flex items-center justify-center min-h-screen bg-gradient-to-br from-black to-green-900 via-emerald-900 relative`} style={{
+            backgroundAttachment: 'fixed',
+        }}>
             <FloatingShape />
-            <div className="bg-gray-800 bg-opacity-70 p-8 rounded shadow-md w-96 z-10">
-                <h2 className="text-2xl font-bold text-green-300 mb-6">Signup</h2>
+            <div
+                style={{
+                    backgroundColor: 'rgba(31, 41, 55, 0.7)', // bg-gray-800 with opacity
+                    padding: '2rem',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+                    width: '24rem',
+                    zIndex: 10,
+                    maxHeight: '90vh', // Limit height for scrolling
+                    overflowY: 'auto', // Enable vertical scrolling
+                    paddingRight: '15px', // Prevent content from being cut off
+                    scrollbarWidth: 'none', // Hide scrollbar for Firefox
+                    margin: '0 auto', // Center the container
+                }}
+                className="scrollable-container"
+            >
+                <h2 className="text-2xl font-bold text-green-300 mb-6 text-center">Signup</h2>
                 <form onSubmit={handleSignup}>
-                <div className="mb-4 flex items-center">
+                    <div className="mb-4 flex items-center">
                         <FontAwesomeIcon icon={faUser } className="text-green-300 mr-2" />
                         <input
                             type="text"
@@ -44,7 +58,7 @@ const Signup = () => {
                         />
                     </div>
                     <div className="mb-4 flex items-center">
-                        <FontAwesomeIcon icon={faUser} className="text-green-300 mr-2" />
+                        <FontAwesomeIcon icon={faUser } className="text-green-300 mr-2" />
                         <input
                             type="text"
                             placeholder="Username"
@@ -65,6 +79,7 @@ const Signup = () => {
                             required
                         />
                     </div>
+                    <PasswordStrengthMeter password={password} /> {/* Add the strength meter here */}
                     <div className="mb-4 flex items-center">
                         <FontAwesomeIcon icon={faIdCard} className="text-green-300 mr-2" />
                         <input
@@ -90,10 +105,15 @@ const Signup = () => {
                     </div>
                     {error && <p className="text-red-500">{error}</p>}
                     
-                    {/* Title for Face Authentication */}
-                    <h3 className="text-lg font-bold text-green-300 mb-4">Face Authentication / KYC</h3>
+                    <h3 className="text-lg font-bold text-green-300 mb-4 text-center">Face Authentication / KYC</h3>
                     
-                    <FaceAuth onCapture={(data) => setCapturedImage(data)} /> {/* Include the FaceAuth component here */}
+                    <FaceAuth 
+                        onCapture={(data) => {
+                            setCapturedImage(data);
+                            setIsCameraOpen(false); // Close camera after capturing
+                        }} 
+                        onOpenCamera={() => setIsCameraOpen(true)} 
+                    />
                     {capturedImage && <img src={capturedImage} alt="Captured" style={{ width: '100%', borderRadius: '10px', marginTop: '10px' }} />}
                     
                     <button type="submit" className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600 transition mt-4">Signup</button>
