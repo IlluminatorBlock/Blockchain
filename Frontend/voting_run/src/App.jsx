@@ -1,10 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-// Import components
 import Home from './components/Home';
 import VotingPage from './components/VotingPage';
 import ThankYouPage from './components/ThankYouPage';
-import LoginPage from './components/Login';
 import SignUpPage from './components/Signup';
 import AddCandidate from './components/AddCandidate';
 import RemoveCandidate from './components/RemoveCandidate';
@@ -15,7 +13,6 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<LoginPage />} />
                 <Route path="/signup" element={<SignUpPage />} />
                 <Route path="/voting" element={<VotingPage />} />
                 <Route path="/thank-you" element={<ThankYouPage />} />
